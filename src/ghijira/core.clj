@@ -147,11 +147,10 @@
 (defn format-comment [c]
   (let [created-at (tf/parse gh-formatter (:created_at c))
         comment-text (comment-or-event-to-text c)]
-    (str "Comment:"
+    (str (tf/unparse jira-formatter created-at)
+         "; "
          (get-user c)
-         ":"
-         (tf/unparse jira-formatter created-at)
-         ":" \newline \newline
+         "; "
          comment-text)))
 
 (defn get-labels
@@ -175,15 +174,15 @@
         milestone-dashes (str/replace (or milestone "") \space \-)]
     (concat
       (vector
-        (+ *issue-offset* (:number issue))
+        (str "https://github.com/draios/" *ghproject* "/issues/" (+ *issue-offset* (:number issue)))
         (:title issue)
         (cross-item-ref-replace (:body issue) *jira-project* *issue-offset*)
         (gh2jira (:created_at issue))
         (gh2jira (:updated_at issue))
-        "Task" ; issue type
+        "Bug" ; issue type
         milestone-dashes
-        (if (= "closed" (:state issue)) "Closed" "Open")
-        (if (= "closed" (:state issue)) "Fixed" "Unresolved")
+        (if (= "closed" (:state issue)) "Done" "To Do")
+        (if (= "closed" (:state issue)) "Done" "Unresolved")
         (get-user issue)
         (get-assignee issue)
         (get-labels issue))

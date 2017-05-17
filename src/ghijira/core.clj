@@ -181,7 +181,7 @@
         (gh2jira (:updated_at issue))
         "Bug" ; issue type
         milestone-dashes
-        (if (= "closed" (:state issue)) "Done" "To Do")
+        (if (= "closed" (:state issue)) "Closed" "Open")
         (if (= "closed" (:state issue)) "Done" "Unresolved")
         (get-user issue)
         (get-assignee issue)

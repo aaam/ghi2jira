@@ -165,27 +165,29 @@
         (reduce #(apply clojure.string/replace %1 %2) content replacement-list)))
 
 (defn get-components [issue]
-  (replace-several 
-    (clojure.string/join " " (filter #(re-matches #"^feat-.*" %) (clojure.string/split (get-labels issue) #" ")))
-      #"feat-alert-editor" "Alert-Editor"
-      #"feat-alert-events" "Alert-Events"
-      #"feat-alerts" "Alerts"
-      #"feat-fast-dashboards" "Fast-Dashboards"
-      #"feat-fast-explore" "Fast-Explore"
-      #"feat-gke" "GKE"
-      #"feat-internal-changes" "Internal-Changes"
-      #"feat-login" "Login"
-      #"feat-notifications" "Notifications"
-      #"feat-old-dashboards" "Old-Dashboards"
-      #"feat-old-explore" "Old-Explore"
-      #"feat-settings" "Settings"
-      #"feat-sysdig-capture" "Sysdig-Capture"
-      #"feat-teams" "Teams"
-      #"feat-time-nav" "Time-Nav"
-      #"feat-time-series" "Time-Series"
-      #"feat-ui-components" "UI-Components"
-      #"feat-walkthrough" "Walkthrough"
-  ))
+  (get
+    (clojure.string/split
+      (replace-several
+        (clojure.string/join " " (filter #(re-matches #"^feat-.*" %) (clojure.string/split (get-labels issue) #" ")))
+          #"feat-alert-editor" "Alert-Editor"
+          #"feat-alert-events" "Alert-Events"
+          #"feat-alerts" "Alerts"
+          #"feat-fast-dashboards" "Fast-Dashboards"
+          #"feat-fast-explore" "Fast-Explore"
+          #"feat-gke" "GKE"
+          #"feat-internal-changes" "Internal-Changes"
+          #"feat-login" "Login"
+          #"feat-notifications" "Notifications"
+          #"feat-old-dashboards" "Old-Dashboards"
+          #"feat-old-explore" "Old-Explore"
+          #"feat-settings" "Settings"
+          #"feat-sysdig-capture" "Sysdig-Capture"
+          #"feat-teams" "Teams"
+          #"feat-time-nav" "Time-Nav"
+          #"feat-time-series" "Time-Series"
+          #"feat-ui-components" "UI-Components"
+          #"feat-walkthrough" "Walkthrough"
+      ) #" ") 0))
 
 ; :number 52 is a good one, lots of comments
 ; (def x (first (filter #(= (:number %) 52) (issues-with-extra-cached))))

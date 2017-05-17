@@ -24,6 +24,7 @@
 (def ^:dynamic *ghproject*)
 (def ^:dynamic *auth*)
 (def ^:dynamic *maxcmt*)
+(def ^:dynamic *maxcomponent*)
 (def ^:dynamic *user-map*)
 (def ^:dynamic *jira-project*)
 (def ^:dynamic *git-base-url*)
@@ -94,13 +95,13 @@
      "Date Created",
      "Date Modified",
      "Issue type",
-     "Component",
      "Milestone",
      "Status",
      "Resolution",
      "Reporter",
      "Assignee",
      "Labels"]
+    (repeat *maxcomponent* "Component")
     (repeat *maxcmt* "Comments") ))
 
 ; Date-time format used by the Github Issues API
@@ -165,29 +166,28 @@
         (reduce #(apply clojure.string/replace %1 %2) content replacement-list)))
 
 (defn get-components [issue]
-  (get
-    (clojure.string/split
-      (replace-several
-        (clojure.string/join " " (filter #(re-matches #"^feat-.*" %) (clojure.string/split (get-labels issue) #" ")))
-          #"feat-alert-editor" "Alert-Editor"
-          #"feat-alert-events" "Alert-Events"
-          #"feat-alerts" "Alerts"
-          #"feat-fast-dashboards" "Fast-Dashboards"
-          #"feat-fast-explore" "Fast-Explore"
-          #"feat-gke" "GKE"
-          #"feat-internal-changes" "Internal-Changes"
-          #"feat-login" "Login"
-          #"feat-notifications" "Notifications"
-          #"feat-old-dashboards" "Old-Dashboards"
-          #"feat-old-explore" "Old-Explore"
-          #"feat-settings" "Settings"
-          #"feat-sysdig-capture" "Sysdig-Capture"
-          #"feat-teams" "Teams"
-          #"feat-time-nav" "Time-Nav"
-          #"feat-time-series" "Time-Series"
-          #"feat-ui-components" "UI-Components"
-          #"feat-walkthrough" "Walkthrough"
-      ) #" ") 0))
+  (clojure.string/split
+    (replace-several 
+      (clojure.string/join " " (filter #(re-matches #"^feat-.*" %) (clojure.string/split (get-labels issue) #" ")))
+        #"feat-alert-editor" "Alert-Editor"
+        #"feat-alert-events" "Alert-Events"
+        #"feat-alerts" "Alerts"
+        #"feat-fast-dashboards" "Fast-Dashboards"
+        #"feat-fast-explore" "Fast-Explore"
+        #"feat-gke" "GKE"
+        #"feat-internal-changes" "Internal-Changes"
+        #"feat-login" "Login"
+        #"feat-notifications" "Notifications"
+        #"feat-old-dashboards" "Old-Dashboards"
+        #"feat-old-explore" "Old-Explore"
+        #"feat-settings" "Settings"
+        #"feat-sysdig-capture" "Sysdig-Capture"
+        #"feat-teams" "Teams"
+        #"feat-time-nav" "Time-Nav"
+        #"feat-time-series" "Time-Series"
+        #"feat-ui-components" "UI-Components"
+        #"feat-walkthrough" "Walkthrough"
+  )#" "))
 
 ; :number 52 is a good one, lots of comments
 ; (def x (first (filter #(= (:number %) 52) (issues-with-extra-cached))))
@@ -210,13 +210,14 @@
         (gh2jira (:created_at issue))
         (gh2jira (:updated_at issue))
         "Bug" ; issue type
-        (get-components issue)
         milestone-dashes
         (if (= "closed" (:state issue)) "Closed" "Open")
         (if (= "closed" (:state issue)) "Done" "Unresolved")
         (get-user issue)
         (get-assignee issue)
         (get-labels issue))
+      (get-components issue) 
+      (repeat (- *maxcomponent* (count (get-components issue))) "")   ; pad out field component
       (map format-comment trimmed-comments)
       (repeat (- *maxcmt* (count trimmed-comments)) "")    ; pad out field count
     )))
@@ -250,6 +251,7 @@
             *ghproject* (:ghproject config)
             *auth* (:auth config)
             *maxcmt* (:maxcmt config)
+            *maxcomponent* (:maxcomponent config)
             *user-map* (:user-map config)
             *jira-project* (:jira-project config)
             *issue-offset* (:issue-offset config)

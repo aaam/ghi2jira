@@ -13,6 +13,9 @@
  ; Maximum number of comments per issue
  :maxcmt 500
 
+ ; Maximum number of Components per issue
+ :maxcomponent 5
+
  ; JIRA project setting - will be used to convert #123 to ABC-123
  ; so that source control integration still works.
  :jira-project "SMBACK"

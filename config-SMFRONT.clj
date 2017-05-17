@@ -29,9 +29,12 @@
  ; Translate user names from
  :user-map
  { "KnoxAnderson" "knox"
+  "aleksandar-ponjavic" "Aleksandar"
+  "aricallen" "Aric"
   "bertocci" "brett"
   "hareshb" "haresh"
   "sbilello" "sergio"
+  "gianluca-zz" "gianluca"
   "gianlucaborello" "gianluca"
   "payalc5" "payal"
   "03cranec" "chris"

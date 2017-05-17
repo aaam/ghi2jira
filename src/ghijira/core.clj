@@ -94,6 +94,7 @@
      "Date Created",
      "Date Modified",
      "Issue type",
+     "Component",
      "Milestone",
      "Status",
      "Resolution",
@@ -159,6 +160,33 @@
         with-dashes (map #(str/replace %1 \space \-) labels)]
     (str/join " " with-dashes)))
 
+(defn replace-several [content & replacements]
+      (let [replacement-list (partition 2 replacements)]
+        (reduce #(apply clojure.string/replace %1 %2) content replacement-list)))
+
+(defn get-components [issue]
+  (replace-several 
+    (clojure.string/join " " (filter #(re-matches #"^feat-.*" %) (clojure.string/split (get-labels issue) #" ")))
+      #"feat-alert-editor" "Alert-Editor"
+      #"feat-alert-events" "Alert-Events"
+      #"feat-alerts" "Alerts"
+      #"feat-fast-dashboards" "Fast-Dashboards"
+      #"feat-fast-explore" "Fast-Explore"
+      #"feat-gke" "GKE"
+      #"feat-internal-changes" "Internal-Changes"
+      #"feat-login" "Login"
+      #"feat-notifications" "Notifications"
+      #"feat-old-dashboards" "Old-Dashboards"
+      #"feat-old-explore" "Old-Explore"
+      #"feat-settings" "Settings"
+      #"feat-sysdig-capture" "Sysdig-Capture"
+      #"feat-teams" "Teams"
+      #"feat-time-nav" "Time-Nav"
+      #"feat-time-series" "Time-Series"
+      #"feat-ui-components" "UI-Components"
+      #"feat-walkthrough" "Walkthrough"
+  ))
+
 ; :number 52 is a good one, lots of comments
 ; (def x (first (filter #(= (:number %) 52) (issues-with-extra-cached))))
 ;(map (juxt :created_at (comp :login :actor) :event :commit_id) (:event-contents x))
@@ -180,6 +208,7 @@
         (gh2jira (:created_at issue))
         (gh2jira (:updated_at issue))
         "Bug" ; issue type
+        (get-components issue)
         milestone-dashes
         (if (= "closed" (:state issue)) "Closed" "Open")
         (if (= "closed" (:state issue)) "Done" "Unresolved")
